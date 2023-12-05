@@ -1,23 +1,25 @@
 import React from 'react';
 
 import LikeButton from '@components/buttons/LikeButton';
-import { PlayerItemDataType } from '~types/players';
+import { Player } from '@interfaces/players';
 
 interface PlayerItemProps {
-  playerData: PlayerItemDataType;
+  playerData: Player;
   handleLike: (id: number | string) => void;
 }
 
 const PlayerItem = ({ playerData, handleLike }: PlayerItemProps) => {
-  const { id, first_name, last_name, team, isLiked } = playerData;
+  const { id, first_name, last_name, position, team, is_liked } = playerData;
+  const abbv = team && team.abbreviation;
 
   return (
     <div className='player-item'>
       <h5>{`${first_name} ${last_name}`}</h5>
-      <p>{team.abbreviation}</p>
-      <button onClick={() => handleLike(id)}>
-        <LikeButton isLiked={isLiked} handleLike={() => handleLike(id)} />
-      </button>
+      <p>
+        {position}
+        {abbv && `, ${abbv}`}
+      </p>
+      <LikeButton isLiked={is_liked} handleLike={() => handleLike(id)} />
     </div>
   );
 };

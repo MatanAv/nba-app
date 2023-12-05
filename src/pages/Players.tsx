@@ -1,7 +1,8 @@
 import React from 'react';
 
 import DivisionsLayout from '@components/layouts/DivisionsLayout';
-import PlayersList from '@components/players/PlayersList';
+import PlayersPool from '@components/players/PlayersPool';
+import FavoritesList from '@components/players/FavoritesList';
 // import PlayerProfile from '@components/players/PlayerProfile';
 
 const Players = () => {
@@ -9,9 +10,9 @@ const Players = () => {
     <div className='players-page'>
       <h1>Welcome to favorites players manager.</h1>
       <DivisionsLayout>
-        <PlayersList key='pool' title='Players Pool' players={[]} />
+        <PlayersPool />
         {/* <PlayerProfile /> */}
-        <PlayersList key='favorites' title='Favorites Players' players={[]} />
+        <FavoritesList />
       </DivisionsLayout>
     </div>
   );

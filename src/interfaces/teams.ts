@@ -1,4 +1,4 @@
-type TeamDataType = {
+export interface Team {
   id: number;
   abbreviation: string;
   city: string;
@@ -6,6 +6,4 @@ type TeamDataType = {
   division: string;
   full_name: string;
   name: string;
-};
-
-export type { TeamDataType };
+}
