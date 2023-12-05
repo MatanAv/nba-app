@@ -32,6 +32,7 @@
       "@services/*": ["services/*"],
       "@interfaces/*": ["interfaces/*"],
       "@enums/*": ["enums/*"],
+      "@api/*": ["services/api/*"],
       "~types/*": ["types/*"]
     }
   },
