@@ -47,7 +47,7 @@ const PlayersList = ({ fetchPage, title, isSearchable = true, pageSize = DEFAULT
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await fetchPage(0);
+      const response = await fetchPage(1);
       setPageData(response);
     };
 

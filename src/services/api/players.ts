@@ -14,16 +14,22 @@ const api = axios.create({
   baseURL: PLAYERS_API_URL
 });
 
-const getPlayersByPage = async (page: number): Promise<PlayersAPIResponseWithMeta> => {
-  const response = await api.get(`?page=${page}`);
+const getPlayersByPage = async (
+  page: number,
+  pageSize: number = DEFAULT_PAGE_SIZE
+): Promise<PlayersAPIResponseWithMeta> => {
+  const response = await api.get(`?page=${page}&per_page=${pageSize}`);
 
   markLikedPlayers(response.data.data);
 
   return response.data;
 };
 
-const getPlayersByName = async (name: string): Promise<PlayersAPIResponseWithMeta> => {
-  const response = await api.get(`?search=${name}`);
+const getPlayersByName = async (
+  name: string,
+  pageSize: number = DEFAULT_PAGE_SIZE
+): Promise<PlayersAPIResponseWithMeta> => {
+  const response = await api.get(`?search=${name}&per_page=${pageSize}`);
 
   markLikedPlayers(response.data.data);
 
@@ -39,22 +45,22 @@ const getPlayerById = async (id: ID): Promise<PlayersAPIResponse> => {
   return player;
 };
 
-const getFavoritesByPage = (page: number): PlayersAPIResponseWithMeta => {
+const getFavoritesByPage = (page: number, pageSize: number = DEFAULT_PAGE_SIZE): PlayersAPIResponseWithMeta => {
   const favorites = Storage.getAll<Player>(TableNames.PLAYERS);
 
-  return getResponseWithMeta<Player>(favorites, DEFAULT_PAGE_SIZE, page);
+  return getResponseWithMeta<Player>(favorites, pageSize, page);
 };
 
-const addFavorite = (player: Player): PlayersAPIResponseWithMeta => {
+const addFavorite = (player: Player, pageSize: number = DEFAULT_PAGE_SIZE): PlayersAPIResponseWithMeta => {
   const updatedFavorites = Storage.createOne<Player>(TableNames.PLAYERS, { ...player, is_liked: true });
 
-  return getResponseWithMeta<Player>(updatedFavorites, DEFAULT_PAGE_SIZE);
+  return getResponseWithMeta<Player>(updatedFavorites, pageSize);
 };
 
-const removeFavorite = (player: Player): PlayersAPIResponseWithMeta => {
+const removeFavorite = (player: Player, pageSize: number = DEFAULT_PAGE_SIZE): PlayersAPIResponseWithMeta => {
   const updatedFavorites = Storage.deleteOne<Player>(TableNames.PLAYERS, player.id);
 
-  return getResponseWithMeta<Player>(updatedFavorites, DEFAULT_PAGE_SIZE);
+  return getResponseWithMeta<Player>(updatedFavorites, pageSize);
 };
 
 export { getPlayersByPage, getPlayersByName, getPlayerById, getFavoritesByPage, addFavorite, removeFavorite };
