@@ -8,11 +8,10 @@ import FavoritesList from '@components/players/FavoritesList';
 const Players = () => {
   return (
     <div className='players-page'>
-      <h1>Welcome to favorites players manager.</h1>
       <DivisionsLayout>
-        <PlayersPool />
+        <PlayersPool key={'players_pool'} />
         {/* <PlayerProfile /> */}
-        <FavoritesList />
+        <FavoritesList key={'fav_players'} />
       </DivisionsLayout>
     </div>
   );

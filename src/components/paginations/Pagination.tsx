@@ -1,5 +1,7 @@
 import React from 'react';
 
+import '@styles/paginations/Pagination.css';
+
 interface PaginationProps {
   currentPage: number;
   pageSize: number;
@@ -16,7 +18,7 @@ const Pagination = ({ currentPage, pageSize, totalItems, totalPages, onPageChang
   const isNextDisabled = currentPage === lastPage;
 
   return (
-    <div className='pagination'>
+    <span className='pagination'>
       <button className='pagination__button' onClick={() => onPageChange(firstPage)} disabled={isPrevDisabled}>
         {'<<'}
       </button>
@@ -24,11 +26,9 @@ const Pagination = ({ currentPage, pageSize, totalItems, totalPages, onPageChang
       <button className='pagination__button' onClick={() => onPageChange(currentPage - 1)} disabled={isPrevDisabled}>
         {'<'}
       </button>
-      <span> | </span>
       <p className='pagination__text'>
         {currentPage} of {lastPage}
       </p>
-      <span> | </span>
       <button className='pagination__button' onClick={() => onPageChange(currentPage + 1)} disabled={isNextDisabled}>
         {'>'}
       </button>
@@ -36,7 +36,7 @@ const Pagination = ({ currentPage, pageSize, totalItems, totalPages, onPageChang
       <button className='pagination__button' onClick={() => onPageChange(lastPage)} disabled={isNextDisabled}>
         {'>>'}
       </button>
-    </div>
+    </span>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { Children } from 'react';
 
-import '@styles/DivisionsLayout.css';
+import '@styles/layouts/DivisionsLayout.css';
 
 interface DivisionsLayoutProps {
   children: React.ReactNode[];

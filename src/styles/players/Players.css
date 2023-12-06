@@ -1,0 +1,40 @@
+.players-list {
+}
+
+.player-item {
+  width: 200px;
+  height: 3rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 10px auto;
+  padding: 5px 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.player-info__text {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+}
+
+.player-info__header {
+}
+
+.player-info__sub-header {
+  margin-top: -10px;
+}
+
+.player-info__text h5 {
+  display: contents;
+}
+
+.player-info__text h6 {
+  display: contents;
+  font-size: 0.6rem;
+}
+
+.like-button-container {
+}
