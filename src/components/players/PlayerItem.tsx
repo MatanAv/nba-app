@@ -3,7 +3,7 @@ import React from 'react';
 import LikeButton from '@components/buttons/LikeButton';
 import { Player } from '@interfaces/players';
 
-import '@styles/players/Players.css';
+import '@styles/players/PlayerItem.css';
 
 interface PlayerItemProps {
   player: Player;

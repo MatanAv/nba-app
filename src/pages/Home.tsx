@@ -2,10 +2,12 @@ import React from 'react';
 
 import Players from './Players';
 
+import '@styles/Home.css';
+
 const Home = () => {
   return (
     <div className='home'>
-      <h3>NBA Favorites Manager</h3>
+      <h2>NBA Favorites App</h2>
       <Players />
     </div>
   );

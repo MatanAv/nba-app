@@ -9,6 +9,8 @@ import { DEFAULT_PAGE_SIZE } from '@utils/constants';
 import { PlayersAPIResponseWithMeta } from '~types/api';
 import { addFavorite, removeFavorite } from '@api/players';
 
+import '@styles/players/PlayersList.css';
+
 interface PlayersListProps {
   title: string;
   fetchPage: (page: number) => Promise<PlayersAPIResponseWithMeta> | PlayersAPIResponseWithMeta;
@@ -41,35 +43,53 @@ const PlayersList = ({ fetchPage, title, isSearchable = true, pageSize = DEFAULT
     setPageData(response);
   };
 
+  const handleAddFavorite = (player: Player) => {
+    const response = addFavorite(player);
+    setPageData(response);
+  };
+
+  const handleRemoveFavorite = (player: Player) => {
+    const response = removeFavorite(player);
+    setPageData(response);
+  };
+
   const items = (pageData.data as Player[]).map((player: Player) => (
-    <PlayerItem key={player.id} player={player} handleLike={player.is_liked ? removeFavorite : addFavorite} />
+    <PlayerItem
+      key={player.id}
+      player={player}
+      handleLike={player.is_liked ? handleRemoveFavorite : handleAddFavorite}
+    />
   ));
 
-  useEffect(() => {
-    const fetch = async () => {
-      const response = await fetchPage(1);
-      setPageData(response);
-    };
+  const initialFetch = async () => {
+    const response = await fetchPage(1);
+    setPageData(response);
+  };
 
-    fetch();
+  useEffect(() => {
+    initialFetch();
   }, []);
 
   return (
     <div className='players-list'>
-      <h4 className='players-list__title'>{title}</h4>
-      {isSearchable && <SearchBar placeholder='Player Name' onTextChange={onTextChange} />}
-      <div className='players-list__list'>
-        {items.length ? items : <div className='players-list__list__empty'>No players found.</div>}
-        {items.length && (
-          <Pagination
-            currentPage={currentPage}
-            pageSize={pageData.meta.per_page}
-            totalItems={pageData.meta.total_count}
-            totalPages={pageData.meta.total_pages}
-            onPageChange={onPageChange}
-          />
-        )}
+      <div className='players-list__container'>
+        <div className='players-list__title'>
+          <h4>{title}</h4>
+        </div>
+        {isSearchable && <SearchBar placeholder='Player Name' onTextChange={onTextChange} />}
+        <div className='players-list__list'>
+          {items.length ? items : <div className='players-list__list__empty'>No players found.</div>}
+        </div>
       </div>
+      {items.length && (
+        <Pagination
+          currentPage={currentPage}
+          pageSize={pageData.meta.per_page}
+          totalItems={pageData.meta.total_count}
+          totalPages={pageData.meta.total_pages}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 };

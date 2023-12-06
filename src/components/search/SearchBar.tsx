@@ -1,5 +1,7 @@
 import React from 'react';
 
+import '@styles/search/SearchBar.css';
+
 interface SearchBarProps {
   onTextChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
@@ -7,7 +9,8 @@ interface SearchBarProps {
 
 const SearchBar = ({ onTextChange, placeholder }: SearchBarProps) => (
   <div className='search-bar'>
-    <input type='text' placeholder={placeholder} onChange={onTextChange} />
+    <input className='search-bar__input' type='text' placeholder={placeholder} onChange={onTextChange} />
+    <button className='search-bar__button'>⌕</button>
   </div>
 );
 

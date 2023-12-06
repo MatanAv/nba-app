@@ -18,7 +18,7 @@ const Pagination = ({ currentPage, pageSize, totalItems, totalPages, onPageChang
   const isNextDisabled = currentPage === lastPage;
 
   return (
-    <span className='pagination'>
+    <div className='pagination'>
       <button className='pagination__button' onClick={() => onPageChange(firstPage)} disabled={isPrevDisabled}>
         {'<<'}
       </button>
@@ -36,7 +36,7 @@ const Pagination = ({ currentPage, pageSize, totalItems, totalPages, onPageChang
       <button className='pagination__button' onClick={() => onPageChange(lastPage)} disabled={isNextDisabled}>
         {'>>'}
       </button>
-    </span>
+    </div>
   );
 };
 
