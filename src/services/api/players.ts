@@ -15,21 +15,11 @@ const api = axios.create({
 });
 
 const getPlayersByPage = async (
-  page: number,
+  page: number = 1,
+  name: string = '',
   pageSize: number = DEFAULT_PAGE_SIZE
 ): Promise<PlayersAPIResponseWithMeta> => {
-  const response = await api.get(`?page=${page}&per_page=${pageSize}`);
-
-  markLikedPlayers(response.data.data);
-
-  return response.data;
-};
-
-const getPlayersByName = async (
-  name: string,
-  pageSize: number = DEFAULT_PAGE_SIZE
-): Promise<PlayersAPIResponseWithMeta> => {
-  const response = await api.get(`?search=${name}&per_page=${pageSize}`);
+  const response = await api.get(`?search=${name}&per_page=${pageSize}&page=${page}`);
 
   markLikedPlayers(response.data.data);
 
@@ -37,7 +27,7 @@ const getPlayersByName = async (
 };
 
 const getPlayerById = async (id: ID): Promise<PlayersAPIResponse> => {
-  const response = await api.get(`/${id}`); // TODO: handle error
+  const response = await api.get(`/${id}`);
   const player = response.data.data;
 
   player.is_liked = Storage.exists(TableNames.PLAYERS, player.id);
@@ -45,8 +35,19 @@ const getPlayerById = async (id: ID): Promise<PlayersAPIResponse> => {
   return player;
 };
 
-const getFavoritesByPage = (page: number, pageSize: number = DEFAULT_PAGE_SIZE): PlayersAPIResponseWithMeta => {
-  const favorites = Storage.getAll<Player>(TableNames.PLAYERS);
+const getFavoritesByPage = (
+  page: number = 1,
+  name: string = '',
+  pageSize: number = DEFAULT_PAGE_SIZE
+): PlayersAPIResponseWithMeta => {
+  let favorites = Storage.getAll<Player>(TableNames.PLAYERS);
+
+  if (name) {
+    favorites = favorites.filter((player: Player) => {
+      const fullName = `${player.first_name} ${player.last_name}`.toLowerCase();
+      return fullName.includes(name.toLowerCase());
+    });
+  }
 
   return getResponseWithMeta<Player>(favorites, pageSize, page);
 };
@@ -63,4 +64,4 @@ const removeFavorite = (player: Player, pageSize: number = DEFAULT_PAGE_SIZE): P
   return getResponseWithMeta<Player>(updatedFavorites, pageSize);
 };
 
-export { getPlayersByPage, getPlayersByName, getPlayerById, getFavoritesByPage, addFavorite, removeFavorite };
+export { getPlayersByPage, getPlayerById, getFavoritesByPage, addFavorite, removeFavorite };

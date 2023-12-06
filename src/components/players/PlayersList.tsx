@@ -13,13 +13,22 @@ import '@styles/players/PlayersList.css';
 
 interface PlayersListProps {
   title: string;
-  fetchPage: (page: number) => Promise<PlayersAPIResponseWithMeta> | PlayersAPIResponseWithMeta;
+  fetchPlayersByPage: (
+    page?: number,
+    name?: string
+  ) => Promise<PlayersAPIResponseWithMeta> | PlayersAPIResponseWithMeta;
   isSearchable?: boolean;
   pageSize?: number;
 }
 
-const PlayersList = ({ fetchPage, title, isSearchable = true, pageSize = DEFAULT_PAGE_SIZE }: PlayersListProps) => {
+const PlayersList = ({
+  fetchPlayersByPage,
+  title,
+  isSearchable = true,
+  pageSize = DEFAULT_PAGE_SIZE
+}: PlayersListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchText, setSearchText] = useState('');
   const [pageData, setPageData] = useState<PlayersAPIResponseWithMeta>({
     data: [],
     meta: {
@@ -31,15 +40,14 @@ const PlayersList = ({ fetchPage, title, isSearchable = true, pageSize = DEFAULT
     }
   });
 
-  // TODO: handle search
-  const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const text = event.target.value.trim();
-    console.log(text);
+  const onSearch = async () => {
+    const response = await fetchPlayersByPage(currentPage, searchText);
+    setPageData(response);
   };
 
   const onPageChange = async (page: number) => {
     setCurrentPage(page);
-    const response = await fetchPage(page);
+    const response = await fetchPlayersByPage(page, searchText);
     setPageData(response);
   };
 
@@ -53,6 +61,15 @@ const PlayersList = ({ fetchPage, title, isSearchable = true, pageSize = DEFAULT
     setPageData(response);
   };
 
+  const initialFetch = async () => {
+    const response = await fetchPlayersByPage(1);
+    setPageData(response);
+  };
+
+  useEffect(() => {
+    initialFetch();
+  }, []);
+
   const items = (pageData.data as Player[]).map((player: Player) => (
     <PlayerItem
       key={player.id}
@@ -61,22 +78,13 @@ const PlayersList = ({ fetchPage, title, isSearchable = true, pageSize = DEFAULT
     />
   ));
 
-  const initialFetch = async () => {
-    const response = await fetchPage(1);
-    setPageData(response);
-  };
-
-  useEffect(() => {
-    initialFetch();
-  }, []);
-
   return (
     <div className='players-list'>
       <div className='players-list__container'>
         <div className='players-list__title'>
           <h4>{title}</h4>
         </div>
-        {isSearchable && <SearchBar placeholder='Player Name' onTextChange={onTextChange} />}
+        {isSearchable && <SearchBar placeholder='Player Name' setText={setSearchText} onSearch={onSearch} />}
         <div className='players-list__list'>
           {items.length ? items : <div className='players-list__list__empty'>No players found.</div>}
         </div>
