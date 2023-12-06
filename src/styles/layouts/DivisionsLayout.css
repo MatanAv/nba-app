@@ -5,9 +5,10 @@
 
 .div-column {
   flex: 1;
-  border: 1px solid #ccc;
   padding: 0 30px 30px;
   margin: 0 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+}
+
+.div-column:not(:last-child) {
+  border-right: 1px solid #cccccc2c;
 }

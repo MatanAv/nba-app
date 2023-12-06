@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'; // TODO: add useMemo
 
-import SearchBar from '../search/SearchBar';
-import Pagination from '../paginations/Pagination';
 import PlayerItem from './PlayerItem';
+import SearchBar from '@components/search/SearchBar';
+import Pagination from '@components/paginations/Pagination';
+import BackgroundColorizer from '@components/tools/BackgroundColorizer';
 
 import { Player } from '@interfaces/players';
 import { DEFAULT_PAGE_SIZE } from '@utils/constants';
@@ -18,6 +19,7 @@ interface PlayersListProps {
     name?: string
   ) => Promise<PlayersAPIResponseWithMeta> | PlayersAPIResponseWithMeta;
   isSearchable?: boolean;
+  isBgColorModifiable?: boolean;
   pageSize?: number;
 }
 
@@ -25,10 +27,12 @@ const PlayersList = ({
   fetchPlayersByPage,
   title,
   isSearchable = true,
+  isBgColorModifiable = false,
   pageSize = DEFAULT_PAGE_SIZE
 }: PlayersListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
+  const [bgColor, setBgColor] = useState('');
   const [pageData, setPageData] = useState<PlayersAPIResponseWithMeta>({
     data: [],
     meta: {
@@ -39,6 +43,10 @@ const PlayersList = ({
       total_count: 0
     }
   });
+
+  const onBgColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBgColor(e.target.value);
+  };
 
   const onSearch = async () => {
     const response = await fetchPlayersByPage(currentPage, searchText);
@@ -56,8 +64,8 @@ const PlayersList = ({
     setPageData(response);
   };
 
-  const handleRemoveFavorite = (player: Player) => {
-    const response = removeFavorite(player);
+  const handleRemoveFavorite = async (player: Player) => {
+    const response = await removeFavorite(player);
     setPageData(response);
   };
 
@@ -79,25 +87,26 @@ const PlayersList = ({
   ));
 
   return (
-    <div className='players-list'>
+    <div className='players-list' style={bgColor ? { backgroundColor: bgColor } : {}}>
       <div className='players-list__container'>
         <div className='players-list__title'>
           <h4>{title}</h4>
         </div>
+        {isBgColorModifiable && <BackgroundColorizer onChange={onBgColorChange} />}
         {isSearchable && <SearchBar placeholder='Player Name' setText={setSearchText} onSearch={onSearch} />}
         <div className='players-list__list'>
           {items.length ? items : <div className='players-list__list__empty'>No players found.</div>}
         </div>
+        {items.length && (
+          <Pagination
+            currentPage={currentPage}
+            pageSize={pageData.meta.per_page}
+            totalItems={pageData.meta.total_count}
+            totalPages={pageData.meta.total_pages}
+            onPageChange={onPageChange}
+          />
+        )}
       </div>
-      {items.length && (
-        <Pagination
-          currentPage={currentPage}
-          pageSize={pageData.meta.per_page}
-          totalItems={pageData.meta.total_count}
-          totalPages={pageData.meta.total_pages}
-          onPageChange={onPageChange}
-        />
-      )}
     </div>
   );
 };
