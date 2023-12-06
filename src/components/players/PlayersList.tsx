@@ -3,26 +3,31 @@ import React, { useState, useEffect } from 'react'; // TODO: add useMemo
 import SearchBar from '../search/SearchBar';
 import Pagination from '../paginations/Pagination';
 import PlayerItem from './PlayerItem';
+
 import { Player } from '@interfaces/players';
-import { PlayerAPIResponse } from '~types/api';
+import { DEFAULT_PAGE_SIZE } from '@utils/constants';
+import { PlayersAPIResponseWithMeta } from '~types/api';
+import { addFavorite, removeFavorite } from '@api/players';
 
 interface PlayersListProps {
-  fetchPlayers: (page: number) => Promise<PlayerAPIResponse> | PlayerAPIResponse;
   title: string;
+  fetchPage: (page: number) => Promise<PlayersAPIResponseWithMeta> | PlayersAPIResponseWithMeta;
   isSearchable?: boolean;
+  pageSize?: number;
 }
 
-const PlayersList = ({ fetchPlayers, title, isSearchable = true }: PlayersListProps) => {
+const PlayersList = ({ fetchPage, title, isSearchable = true, pageSize = DEFAULT_PAGE_SIZE }: PlayersListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageData, setPageData] = useState<PlayerAPIResponse>({
+  const [pageData, setPageData] = useState<PlayersAPIResponseWithMeta>({
     data: [],
-    meta: { per_page: 1, total_count: 0, total_pages: 1 }
+    meta: {
+      total_pages: 0,
+      current_page: 1,
+      next_page: null,
+      per_page: pageSize,
+      total_count: 0
+    }
   });
-
-  // TODO: handle like
-  const handleLike = (id: number | string) => {
-    console.log(id);
-  };
 
   // TODO: handle search
   const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,17 +37,17 @@ const PlayersList = ({ fetchPlayers, title, isSearchable = true }: PlayersListPr
 
   const onPageChange = async (page: number) => {
     setCurrentPage(page);
-    const response = await fetchPlayers(page);
+    const response = await fetchPage(page);
     setPageData(response);
   };
 
-  const items = pageData.data.map((player: Player) => (
-    <PlayerItem key={player.id} playerData={player} handleLike={handleLike} />
+  const items = (pageData.data as Player[]).map((player: Player) => (
+    <PlayerItem key={player.id} player={player} handleLike={player.is_liked ? removeFavorite : addFavorite} />
   ));
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await fetchPlayers(0);
+      const response = await fetchPage(0);
       setPageData(response);
     };
 

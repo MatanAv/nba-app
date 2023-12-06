@@ -1,8 +1,8 @@
 import React from 'react';
 
 import PlayersList from './PlayersList';
-import { getPlayersByPage } from '@api/players';
+import { getFavoritesByPage } from '@api/players';
 
-const FavoritesList = () => <PlayersList title='Favorites List' fetchPlayers={getPlayersByPage} />;
+const FavoritesList = () => <PlayersList key={'favorites'} title='Favorites List' fetchPage={getFavoritesByPage} />;
 
 export default FavoritesList;
