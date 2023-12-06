@@ -1,4 +1,6 @@
-export interface Team {
+import { Model } from './storage';
+
+export interface Team extends Model {
   id: number;
   abbreviation: string;
   city: string;

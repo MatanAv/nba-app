@@ -1,67 +1,88 @@
-// // import { v4 as uuidv4 } from 'uuid';
-// import ITodo from '@interfaces/models/todo';
+import { TableData } from '@interfaces/storage';
+import { Model } from '@interfaces/model';
+import { ID } from '~types/model';
 
-// class TodoStorage {
-//   static instance: TodoStorage;
+class Storage {
+  static instance: Storage;
 
-//   init(todos: ITodo[]) {
-//     if (!localStorage.getItem(`todos`)) {
-//       localStorage.setItem(`todos`, JSON.stringify(todos));
-//     }
-//   }
+  init<T extends Model>(tableName: string) {
+    if (!localStorage.getItem(tableName)) {
+      const data: TableData<T> = {};
+      localStorage.setItem(tableName, JSON.stringify(data));
+    }
+  }
 
-//   getAll(): ITodo[] {
-//     const todos = localStorage.getItem(`todos`);
+  private getTable<T extends Model>(tableName: string): TableData<T> {
+    const table = localStorage.getItem(tableName);
 
-//     if (!todos) throw new Error(`No todos found`);
+    if (!table) throw new Error(`Table not exist`);
 
-//     return JSON.parse(todos);
-//   }
+    return JSON.parse(table);
+  }
 
-//   getOne(id: string): ITodo {
-//     const todo = this.getAll().find((todo: ITodo) => todo.id === id);
+  getAll<T extends Model>(tableName: string): T[] {
+    const table = this.getTable(tableName);
 
-//     if (!todo) throw new Error(`No todo found with id ${id}`);
+    return Object.values(table) as T[];
+  }
 
-//     return todo;
-//   }
+  getOne<T extends Model>(tableName: string, id: ID): T {
+    const table = this.getTable(tableName);
+    const item = table[id];
 
-//   createOne(title: string): ITodo[] {
-//     const todos = this.getAll();
-//     const todo: ITodo = { id: uuidv4(), title, completed: false };
+    if (!item) throw new Error(`No item found with id ${id}`);
 
-//     todos.push(todo);
+    return item as T;
+  }
 
-//     localStorage.setItem('todos', JSON.stringify(todos));
+  createOne<T extends Model>(tableName: string, item: T): T[] {
+    const table = this.getTable(tableName);
 
-//     return todos;
-//   }
+    if (table[item.id]) throw new Error(`Item with id ${item.id} already exist`);
 
-//   updateOne(newTodo: ITodo): ITodo[] {
-//     const todos = this.getAll();
-//     const newTodos = todos.map((todo: ITodo) => (todo.id === newTodo.id ? newTodo : todo));
+    table[item.id] = item;
 
-//     localStorage.setItem('todos', JSON.stringify(newTodos));
+    localStorage.setItem(tableName, JSON.stringify(table));
 
-//     return newTodos;
-//   }
+    return Object.values(table) as T[];
+  }
 
-//   deleteOne(id: string): ITodo[] {
-//     const todos = this.getAll();
-//     const newTodos = todos.filter((todo: ITodo) => todo.id !== id);
+  updateOne<T extends Model>(tableName: string, updatedItem: T): T[] {
+    const table = this.getTable(tableName);
 
-//     localStorage.setItem('todos', JSON.stringify(newTodos));
+    if (!table[updatedItem.id]) throw new Error(`No item found with id ${updatedItem.id}`);
 
-//     return newTodos;
-//   }
+    table[updatedItem.id] = updatedItem;
 
-//   public static getInstance() {
-//     if (!TodoStorage.instance) {
-//       TodoStorage.instance = new TodoStorage();
-//     }
+    localStorage.setItem(tableName, JSON.stringify(table));
 
-//     return TodoStorage.instance;
-//   }
-// }
+    return Object.values(table) as T[];
+  }
 
-// export default TodoStorage.getInstance();
+  deleteOne<T extends Model>(tableName: string, id: ID): T[] {
+    const table = this.getTable(tableName);
+
+    if (!table[id]) throw new Error(`No item found with id ${id}`);
+
+    delete table[id];
+
+    localStorage.setItem(tableName, JSON.stringify(table));
+
+    return Object.values(table) as T[];
+  }
+
+  exists(tableName: string, id: ID): boolean {
+    const table = this.getTable(tableName);
+
+    return !!table[id];
+  }
+
+  public static getInstance() {
+    if (!Storage.instance) {
+      Storage.instance = new Storage();
+    }
+    return Storage.instance;
+  }
+}
+
+export default Storage.getInstance();

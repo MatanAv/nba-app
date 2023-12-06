@@ -1,6 +1,7 @@
+import { Model } from './storage';
 import { Team } from './teams';
 
-export interface Player {
+export interface Player extends Model {
   id: string;
   first_name: string;
   last_name: string;
