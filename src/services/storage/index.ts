@@ -26,13 +26,11 @@ class Storage {
     return Object.values(table) as T[];
   }
 
-  getOne<T extends Model>(tableName: string, id: ID): T {
+  getOne<T extends Model>(tableName: string, id: ID): T | null {
     const table = this.getTable(tableName);
     const item = table[id];
 
-    if (!item) throw new Error(`No item found with id ${id}`);
-
-    return item as T;
+    return item ? (item as T) : null;
   }
 
   createOne<T extends Model>(tableName: string, item: T): T[] {

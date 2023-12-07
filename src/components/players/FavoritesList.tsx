@@ -7,7 +7,7 @@ const FavoritesList = () => (
   <PlayersList
     key={'favorites'}
     title='Favorites List'
-    isSearchable={true}
+    isSearchable={false}
     isBgColorModifiable={true}
     fetchPlayersByPage={getFavoritesByPage}
   />

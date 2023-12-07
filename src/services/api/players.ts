@@ -6,7 +6,7 @@ import { TableNames } from '@enums/storage';
 import { markLikedPlayers } from '@utils/players';
 import { getResponseWithMeta } from '@utils/api';
 import { DEFAULT_PAGE_SIZE, PLAYERS_API_URL } from '@utils/constants';
-import { PlayersAPIResponse, PlayersAPIResponseWithMeta } from '~types/api';
+import { PlayersAPIResponseWithMeta } from '~types/api';
 
 Storage.init<Player>(TableNames.PLAYERS);
 
@@ -26,14 +26,8 @@ const getPlayersByPage = async (
   return response.data;
 };
 
-const getPlayerById = async (id: ID): Promise<PlayersAPIResponse> => {
-  const response = await api.get(`/${id}`);
-  const player = response.data.data;
-
-  player.is_liked = Storage.exists(TableNames.PLAYERS, player.id);
-
-  return player;
-};
+const getPlayerById = async (id: ID): Promise<Player> =>
+  Storage.getOne<Player>(TableNames.PLAYERS, id) || (await api.get(`/${id}`)).data;
 
 const getFavoritesByPage = (
   page: number = 1,
@@ -52,16 +46,12 @@ const getFavoritesByPage = (
   return getResponseWithMeta<Player>(favorites, pageSize, page);
 };
 
-const addFavorite = (player: Player, pageSize: number = DEFAULT_PAGE_SIZE): PlayersAPIResponseWithMeta => {
-  const updatedFavorites = Storage.createOne<Player>(TableNames.PLAYERS, { ...player, is_liked: true });
-
-  return getResponseWithMeta<Player>(updatedFavorites, pageSize);
+const addFavorite = (player: Player): void => {
+  Storage.createOne<Player>(TableNames.PLAYERS, { ...player, is_liked: true });
 };
 
-const removeFavorite = (player: Player, pageSize: number = DEFAULT_PAGE_SIZE): PlayersAPIResponseWithMeta => {
-  const updatedFavorites = Storage.deleteOne<Player>(TableNames.PLAYERS, player.id);
-
-  return getResponseWithMeta<Player>(updatedFavorites, pageSize);
+const removeFavorite = (player: Player): void => {
+  Storage.deleteOne<Player>(TableNames.PLAYERS, player.id);
 };
 
 export { getPlayersByPage, getPlayerById, getFavoritesByPage, addFavorite, removeFavorite };

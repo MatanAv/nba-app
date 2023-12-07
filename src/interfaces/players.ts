@@ -1,4 +1,4 @@
-import { Model } from './storage';
+import { Model } from '@interfaces/model';
 import { Team } from './teams';
 
 export interface Player extends Model {

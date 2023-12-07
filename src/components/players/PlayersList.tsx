@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react'; // TODO: add useMemo
+import React, { useState, useEffect, useContext } from 'react'; // TODO: add useMemo
 
 import PlayerItem from './PlayerItem';
 import SearchBar from '@components/search/SearchBar';
 import Pagination from '@components/paginations/Pagination';
 import BackgroundColorizer from '@components/tools/BackgroundColorizer';
 
+import { ID } from '~types/model';
 import { Player } from '@interfaces/players';
 import { DEFAULT_PAGE_SIZE } from '@utils/constants';
 import { PlayersAPIResponseWithMeta } from '~types/api';
 import { addFavorite, removeFavorite } from '@api/players';
+import { HasFavoritesUpdatedContext, SelectedProfileIdContext } from '@pages/Players';
 
 import '@styles/players/PlayersList.css';
 
@@ -30,6 +32,9 @@ const PlayersList = ({
   isBgColorModifiable = false,
   pageSize = DEFAULT_PAGE_SIZE
 }: PlayersListProps) => {
+  const { setHasFavoritesUpdated } = useContext(HasFavoritesUpdatedContext)!;
+  const { setSelectedProfileId } = useContext(SelectedProfileIdContext)!;
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
   const [bgColor, setBgColor] = useState('');
@@ -43,6 +48,10 @@ const PlayersList = ({
       total_count: 0
     }
   });
+
+  const onPlayerClick = (id: ID) => {
+    setSelectedProfileId(id);
+  };
 
   const onBgColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBgColor(e.target.value);
@@ -60,13 +69,13 @@ const PlayersList = ({
   };
 
   const handleAddFavorite = (player: Player) => {
-    const response = addFavorite(player);
-    setPageData(response);
+    addFavorite(player);
+    setHasFavoritesUpdated(true);
   };
 
-  const handleRemoveFavorite = async (player: Player) => {
-    const response = await removeFavorite(player);
-    setPageData(response);
+  const handleRemoveFavorite = (player: Player) => {
+    removeFavorite(player);
+    setHasFavoritesUpdated(true);
   };
 
   const initialFetch = async () => {
@@ -82,6 +91,7 @@ const PlayersList = ({
     <PlayerItem
       key={player.id}
       player={player}
+      onPlayerClick={onPlayerClick}
       handleLike={player.is_liked ? handleRemoveFavorite : handleAddFavorite}
     />
   ));

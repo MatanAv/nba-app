@@ -17,11 +17,13 @@
   align-items: baseline;
 }
 
-.player-info__header {
+.player-info__header:hover {
+  cursor: pointer;
+  color: #757bed;
 }
 
 .player-info__sub-header {
-  margin-top: -10px;
+  margin-top: -7.5px;
 }
 
 .player-info__text h5 {
