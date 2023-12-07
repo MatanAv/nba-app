@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'; // TODO: add useMemo
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 
 import PlayerItem from './PlayerItem';
 import SearchBar from '@components/search/SearchBar';
@@ -18,7 +18,8 @@ interface PlayersListProps {
   title: string;
   fetchPlayersByPage: (
     page?: number,
-    name?: string
+    name?: string,
+    pageSize?: number
   ) => Promise<PlayersAPIResponseWithMeta> | PlayersAPIResponseWithMeta;
   isSearchable?: boolean;
   isBgColorModifiable?: boolean;
@@ -35,6 +36,8 @@ const PlayersList = ({
   const { setHasFavoritesUpdated } = useContext(HasFavoritesUpdatedContext)!;
   const { setSelectedProfileId } = useContext(SelectedProfileIdContext)!;
 
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
   const [bgColor, setBgColor] = useState('');
@@ -49,52 +52,93 @@ const PlayersList = ({
     }
   });
 
-  const onPlayerClick = (id: ID) => {
-    setSelectedProfileId(id);
-  };
+  const onPlayerClick = useCallback(
+    (id: ID) => {
+      setSelectedProfileId(id);
+    },
+    [setSelectedProfileId]
+  );
 
   const onBgColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBgColor(e.target.value);
   };
 
-  const onSearch = async () => {
-    const response = await fetchPlayersByPage(currentPage, searchText);
-    setPageData(response);
-  };
+  const handleAddFavorite = useCallback(
+    (player: Player) => {
+      addFavorite(player);
+      setHasFavoritesUpdated(true);
+    },
+    [setHasFavoritesUpdated]
+  );
+
+  const handleRemoveFavorite = useCallback(
+    (player: Player) => {
+      removeFavorite(player);
+      setHasFavoritesUpdated(true);
+    },
+    [setHasFavoritesUpdated]
+  );
+
+  const fetchWithLoading = useCallback(
+    async (page: number = 1, name: string = '', pageSize: number = DEFAULT_PAGE_SIZE) => {
+      setIsLoading(true);
+
+      try {
+        const response = await fetchPlayersByPage(page, name, pageSize);
+        setPageData(response);
+      } catch (error) {
+        setError((error as Error).message);
+      }
+
+      setIsLoading(false);
+    },
+    [fetchPlayersByPage]
+  );
+
+  const onSearch = async () => await fetchWithLoading(currentPage, searchText);
 
   const onPageChange = async (page: number) => {
     setCurrentPage(page);
-    const response = await fetchPlayersByPage(page, searchText);
-    setPageData(response);
-  };
-
-  const handleAddFavorite = (player: Player) => {
-    addFavorite(player);
-    setHasFavoritesUpdated(true);
-  };
-
-  const handleRemoveFavorite = (player: Player) => {
-    removeFavorite(player);
-    setHasFavoritesUpdated(true);
-  };
-
-  const initialFetch = async () => {
-    const response = await fetchPlayersByPage(1);
-    setPageData(response);
+    await fetchWithLoading(page, searchText);
   };
 
   useEffect(() => {
-    initialFetch();
-  }, []);
+    fetchWithLoading();
+  }, [fetchWithLoading]);
 
-  const items = (pageData.data as Player[]).map((player: Player) => (
-    <PlayerItem
-      key={player.id}
-      player={player}
-      onPlayerClick={onPlayerClick}
-      handleLike={player.is_liked ? handleRemoveFavorite : handleAddFavorite}
-    />
-  ));
+  const items = useMemo(
+    () =>
+      (pageData.data as Player[]).map((player: Player) => (
+        <PlayerItem
+          key={player.id}
+          player={player}
+          onPlayerClick={onPlayerClick}
+          handleLike={player.is_liked ? handleRemoveFavorite : handleAddFavorite}
+        />
+      )),
+    [handleAddFavorite, handleRemoveFavorite, onPlayerClick, pageData.data]
+  );
+
+  const renderedList = (
+    <>
+      <div className='players-list__list'>
+        {items.length ? (
+          items
+        ) : (
+          <div className='players-list__list__empty'>{searchText ? 'No players found.' : 'List is empty.'}</div>
+        )}
+      </div>
+      {items.length ? (
+        <Pagination
+          currentPage={currentPage}
+          pageSize={pageData.meta.per_page}
+          totalItems={pageData.meta.total_count}
+          totalPages={pageData.meta.total_pages}
+          onPageChange={onPageChange}
+        />
+      ) : null}
+    </>
+  );
 
   return (
     <div className='players-list' style={bgColor ? { backgroundColor: bgColor } : {}}>
@@ -104,18 +148,7 @@ const PlayersList = ({
         </div>
         {isBgColorModifiable && <BackgroundColorizer onChange={onBgColorChange} />}
         {isSearchable && <SearchBar placeholder='Player Name' setText={setSearchText} onSearch={onSearch} />}
-        <div className='players-list__list'>
-          {items.length ? items : <div className='players-list__list__empty'>No players found.</div>}
-        </div>
-        {items.length && (
-          <Pagination
-            currentPage={currentPage}
-            pageSize={pageData.meta.per_page}
-            totalItems={pageData.meta.total_count}
-            totalPages={pageData.meta.total_pages}
-            onPageChange={onPageChange}
-          />
-        )}
+        {isLoading ? <div className='players-list__loading'>Loading...</div> : error ? <p>{error}</p> : renderedList}
       </div>
     </div>
   );
