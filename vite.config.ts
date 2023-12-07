@@ -15,6 +15,7 @@ export default defineConfig({
       '@services': '/src/services',
       '@interfaces': '/src/interfaces',
       '@enums': '/src/enums',
+      '@api': '/src/services/api',
       '~types': '/src/types'
     }
   }

@@ -1,9 +1,12 @@
-import React from 'react';
+import Players from './Players';
+
+import '@styles/Home.css';
 
 const Home = () => {
   return (
     <div className='home'>
-      <h1>Home Page</h1>
+      <h2>NBA Favorites App</h2>
+      <Players />
     </div>
   );
 };

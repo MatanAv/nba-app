@@ -1,0 +1,13 @@
+.home {
+  padding: 1rem;
+}
+
+.home > * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.home > h2 {
+  margin: 0 0 2rem;
+}

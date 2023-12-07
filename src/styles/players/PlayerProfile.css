@@ -1,0 +1,19 @@
+.player-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: max-content;
+  margin: 0 auto;
+}
+
+.player-profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.player-profile-info > * {
+  padding: 0;
+  margin: 0.3rem 0;
+  font-size: 0.8rem;
+}

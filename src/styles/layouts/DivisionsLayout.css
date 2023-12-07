@@ -1,0 +1,15 @@
+.div-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.div-column {
+  flex: 1;
+  width: 100%;
+  padding: 0 30px 30px;
+  margin: 0 10px;
+}
+
+.div-column:not(:last-child) {
+  border-right: 1px solid #cccccc2c;
+}
