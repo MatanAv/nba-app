@@ -1,3 +1,3 @@
 export enum TableNames {
-  PLAYERS = 'players'
+  FAVORITES = 'favorites'
 }
