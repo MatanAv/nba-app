@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Players from './Players';
 
 import '@styles/Home.css';

@@ -1,4 +1,4 @@
-import { Model } from './storage';
+import { Model } from '@interfaces/model';
 
 export interface Team extends Model {
   id: number;

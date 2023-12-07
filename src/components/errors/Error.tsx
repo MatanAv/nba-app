@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { HttpErrorType, ErrorType } from '~types/errors';
 
 interface ErrorProps {

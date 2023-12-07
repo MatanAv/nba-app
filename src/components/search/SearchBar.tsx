@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-
 import '@styles/search/SearchBar.css';
 
 interface SearchBarProps {
