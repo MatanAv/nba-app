@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 
 import PlayerItem from './PlayerItem';
+import Error from '@components/errors/Error';
 import SearchBar from '@components/search/SearchBar';
 import Pagination from '@components/paginations/Pagination';
 import BackgroundColorizer from '@components/tools/BackgroundColorizer';
 
 import { ID } from '~types/model';
+import { ErrorType } from '~types/errors';
 import { Player } from '@interfaces/players';
 import { DEFAULT_PAGE_SIZE } from '@utils/constants';
 import { PlayersAPIResponseWithMeta } from '~types/api';
@@ -36,7 +38,7 @@ const PlayersList = ({
   const { setHasFavoritesUpdated } = useContext(HasFavoritesUpdatedContext)!;
   const { setSelectedProfileId } = useContext(SelectedProfileIdContext)!;
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState<ErrorType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
@@ -87,10 +89,10 @@ const PlayersList = ({
         const response = await fetchPlayersByPage(page, name, pageSize);
         setPageData(response);
       } catch (error) {
-        setError((error as Error).message);
+        setError(error as ErrorType);
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     },
     [fetchPlayersByPage]
   );
@@ -148,7 +150,13 @@ const PlayersList = ({
         </div>
         {isBgColorModifiable && <BackgroundColorizer onChange={onBgColorChange} />}
         {isSearchable && <SearchBar placeholder='Player Name' setText={setSearchText} onSearch={onSearch} />}
-        {isLoading ? <div className='players-list__loading'>Loading...</div> : error ? <p>{error}</p> : renderedList}
+        {isLoading ? (
+          <div className='players-list__loading'>Loading...</div>
+        ) : error ? (
+          <Error error={error} />
+        ) : (
+          renderedList
+        )}
       </div>
     </div>
   );

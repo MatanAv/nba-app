@@ -1,7 +1,11 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Storage from '@services/storage';
+import HttpError from '@services/http-errors';
+import { StatusCodes } from 'http-status-codes';
+
 import { ID } from '~types/model';
 import { Player } from '@interfaces/players';
+import { ERRORS } from '@enums/errors';
 import { TableNames } from '@enums/storage';
 import { markLikedPlayers } from '@utils/players';
 import { getResponseWithMeta } from '@utils/api';
@@ -26,8 +30,17 @@ const getPlayersByPage = async (
   return response.data;
 };
 
-const getPlayerById = async (id: ID): Promise<Player> =>
-  Storage.getOne<Player>(TableNames.FAVORITES, id) || (await api.get(`/${id}`)).data;
+const getPlayerById = async (id: ID): Promise<Player> => {
+  try {
+    return Storage.getOne<Player>(TableNames.FAVORITES, id) || (await api.get(`/${id}`)).data;
+  } catch (error) {
+    if ((error as TypeError).message === ERRORS.NOT_FOUND) {
+      throw new HttpError('Player not found', StatusCodes.NOT_FOUND);
+    }
+
+    throw new HttpError((error as AxiosError).message, Number((error as AxiosError).response?.status));
+  }
+};
 
 const getFavoritesByPage = (
   page: number = 1,
@@ -47,11 +60,27 @@ const getFavoritesByPage = (
 };
 
 const addFavorite = (player: Player): void => {
-  Storage.createOne<Player>(TableNames.FAVORITES, { ...player, is_liked: true });
+  try {
+    Storage.createOne<Player>(TableNames.FAVORITES, { ...player, is_liked: true });
+  } catch (error) {
+    if ((error as TypeError).message === ERRORS.ALREADY_EXIST) {
+      throw new HttpError('Player already exist', StatusCodes.BAD_REQUEST);
+    }
+
+    throw new HttpError(ERRORS.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR);
+  }
 };
 
 const removeFavorite = (player: Player): void => {
-  Storage.deleteOne<Player>(TableNames.FAVORITES, player.id);
+  try {
+    Storage.deleteOne<Player>(TableNames.FAVORITES, player.id);
+  } catch (error) {
+    if ((error as TypeError).message === ERRORS.NOT_FOUND) {
+      throw new HttpError('Player not found', StatusCodes.NOT_FOUND);
+    }
+
+    throw new HttpError(ERRORS.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR);
+  }
 };
 
 export { getPlayersByPage, getPlayerById, getFavoritesByPage, addFavorite, removeFavorite };

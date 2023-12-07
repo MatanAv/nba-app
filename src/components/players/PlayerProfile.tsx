@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
+import Error from '@components/errors/Error';
+
 import { ID } from '~types/model';
+import { ErrorType } from '~types/errors';
 import { Player } from '@interfaces/players';
 import { getPlayerById } from '@api/players';
 
@@ -13,7 +16,7 @@ interface PlayerProfileProps {
 const PlayerProfile = ({ playerId }: PlayerProfileProps) => {
   const [player, setPlayer] = useState<Player | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<ErrorType | null>(null);
 
   useEffect(() => {
     const fetchPlayerData = async () => {
@@ -22,9 +25,10 @@ const PlayerProfile = ({ playerId }: PlayerProfileProps) => {
           setIsLoading(true);
           const player = await getPlayerById(playerId);
           setPlayer(player);
-          setIsLoading(false);
         } catch (error) {
-          setError((error as Error).message);
+          setError(error as ErrorType);
+        } finally {
+          setIsLoading(false);
         }
       }
     };
@@ -65,7 +69,7 @@ const PlayerProfile = ({ playerId }: PlayerProfileProps) => {
       {isLoading ? (
         <p>Loading...</p>
       ) : error ? (
-        <p>{error}</p>
+        <Error error={error} />
       ) : profile ? (
         profile
       ) : (

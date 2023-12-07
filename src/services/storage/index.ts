@@ -1,5 +1,6 @@
 import { TableData } from '@interfaces/storage';
 import { Model } from '@interfaces/model';
+import { ERRORS } from '@enums/errors';
 import { ID } from '~types/model';
 
 class Storage {
@@ -15,7 +16,7 @@ class Storage {
   private getTable<T extends Model>(tableName: string): TableData<T> {
     const table = localStorage.getItem(tableName);
 
-    if (!table) throw new Error(`Table not exist`);
+    if (!table) throw new Error(ERRORS.INTERNAL_SERVER_ERROR);
 
     return JSON.parse(table);
   }
@@ -36,7 +37,7 @@ class Storage {
   createOne<T extends Model>(tableName: string, item: T): T[] {
     const table = this.getTable(tableName);
 
-    if (table[item.id]) throw new Error(`Item with id ${item.id} already exist`);
+    if (table[item.id]) throw new Error(ERRORS.ALREADY_EXIST);
 
     table[item.id] = item;
 
@@ -48,7 +49,7 @@ class Storage {
   updateOne<T extends Model>(tableName: string, updatedItem: T): T[] {
     const table = this.getTable(tableName);
 
-    if (!table[updatedItem.id]) throw new Error(`No item found with id ${updatedItem.id}`);
+    if (!table[updatedItem.id]) throw new Error(ERRORS.NOT_FOUND);
 
     table[updatedItem.id] = updatedItem;
 
@@ -60,7 +61,7 @@ class Storage {
   deleteOne<T extends Model>(tableName: string, id: ID): T[] {
     const table = this.getTable(tableName);
 
-    if (!table[id]) throw new Error(`No item found with id ${id}`);
+    if (!table[id]) throw new Error(ERRORS.NOT_FOUND);
 
     delete table[id];
 
