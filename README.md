@@ -38,10 +38,12 @@ Given more time and resources, the following improvements could be made to enhan
 
 To run the project locally, follow these steps:
 
-1. Clone the repository or download and extract the `.zip` file.
+1. Clone this repository [https://github.com/MatanAv/nba-app](https://github.com/MatanAv/nba-app) or download and extract the `.zip` file from the Github project.
 
-2. Install the required packages by running the following command in the terminal: `npm install`.
+2. Install the required packages by running the following command in the terminal: `yarn`.
 
-3. Start the development server by running the following command: `npm start`.
+3. Build the project by running the following command: `yarn build`.
 
-4. Once the server is running, you can access the application by navigating to [http://localhost:4173](http://localhost:4173) in your web browser.
+4. Start the app by running the following command: `yarn start`.
+
+5. Once the app is running, you can access the application by navigating to [http://localhost:4173](http://localhost:4173) in your web browser.
