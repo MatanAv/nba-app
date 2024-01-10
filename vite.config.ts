@@ -12,6 +12,11 @@ export default defineConfig({
     strictPort: true,
     port: 5173
   },
+  build: {
+    outDir: 'build',
+    assetsDir: 'assets',
+    emptyOutDir: true
+  },
   resolve: {
     alias: {
       '@': '/src',
