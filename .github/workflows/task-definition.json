@@ -1,5 +1,5 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:eu-north-1:891377293813:task-definition/nba-app:1",
+  "taskDefinitionArn": "arn:aws:ecs:eu-north-1:891377293813:task-definition/nba-app:3",
   "containerDefinitions": [
     {
       "name": "nba-app",
@@ -9,9 +9,9 @@
       "memoryReservation": 131,
       "portMappings": [
         {
-          "name": "nba-app-80-tcp",
-          "containerPort": 80,
-          "hostPort": 80,
+          "name": "nba-app-8080-tcp",
+          "containerPort": 8080,
+          "hostPort": 8080,
           "protocol": "tcp",
           "appProtocol": "http"
         }
@@ -21,21 +21,44 @@
       "environmentFiles": [],
       "mountPoints": [],
       "volumesFrom": [],
-      "ulimits": []
+      "ulimits": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/nba-app",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs"
+        },
+        "secretOptions": []
+      }
     }
   ],
   "family": "nba-app",
+  "taskRoleArn": "arn:aws:iam::891377293813:role/ecsTaskExecutionRole",
   "executionRoleArn": "arn:aws:iam::891377293813:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
-  "revision": 1,
+  "revision": 3,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
     {
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
       "name": "com.amazonaws.ecs.capability.ecr-auth"
     },
     {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    },
+    {
       "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
     },
     {
       "name": "ecs.capability.execution-role-ecr-pull"
@@ -45,6 +68,9 @@
     },
     {
       "name": "ecs.capability.task-eni"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
     }
   ],
   "placementConstraints": [],
@@ -56,7 +82,7 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2024-01-14T15:38:48.887Z",
+  "registeredAt": "2024-01-14T16:06:42.893Z",
   "registeredBy": "arn:aws:iam::891377293813:root",
   "tags": []
 }
