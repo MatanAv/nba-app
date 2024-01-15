@@ -35,7 +35,7 @@ env:
   ECR_REPOSITORY: nba-app
   ECS_SERVICE: nba-app
   ECS_CLUSTER: nba-app
-  ECS_TASK_DEFINITION: .github/workflows/task-definition.json
+  ECS_TASK_DEFINITION: .github/workflows/task-definition.json #
   CONTAINER_NAME: nba-app
 
 permissions:
